@@ -17,7 +17,7 @@ webapp/
     views.py         path, lesson player, answer checking, completion, profile, auth
     management/commands/
       seed_content.py    loads Section 0 Unit 1 (2 lessons, 10 exercises) + demo user
-      generate_audio.py  renders Piper (Mana) audio for every word — normal + slow
+      generate_audio.py  renders Piper (gyro) audio for every word — normal + slow
   templates/         base, learn pages, login/register
   static/learn/      app.css (RTL-aware) + lesson.js (the exercise engine)
   deploy/            gunicorn.service, apache-persian.conf, setup.sh
@@ -47,4 +47,4 @@ expected on a dev box without the voice).
 ## Production
 
 See **DEPLOY.md** — Postgres + Gunicorn + Apache on the Ubuntu server, with the
-Mana Persian voice generating all audio locally.
+gyro Persian voice generating all audio locally.

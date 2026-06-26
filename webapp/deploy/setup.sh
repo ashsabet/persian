@@ -22,15 +22,15 @@ fi
 # shellcheck disable=SC1091
 set -a; source .env; set +a
 
-# 3) Download the Mana Persian Piper voice (MIT license)
-MODEL_PATH="${PIPER_MODEL:-/opt/piper/voices/fa_IR-mana-medium.onnx}"
+# 3) Download the gyro Persian Piper voice (MIT license)
+MODEL_PATH="${PIPER_MODEL:-/opt/piper/voices/fa_IR-gyro-medium.onnx}"
 MODEL_DIR="$(dirname "$MODEL_PATH")"
-BASE="https://huggingface.co/MahtaFetrat/Mana-Persian-Piper/resolve/main"
+BASE="https://huggingface.co/rhasspy/piper-voices/resolve/main/fa/fa_IR/gyro/medium"
 if [ ! -f "$MODEL_PATH" ]; then
     sudo mkdir -p "$MODEL_DIR"
-    echo ">> Downloading Mana voice to $MODEL_DIR ..."
-    sudo curl -L -o "$MODEL_PATH"        "$BASE/fa_IR-mana-medium.onnx"
-    sudo curl -L -o "$MODEL_PATH.json"   "$BASE/fa_IR-mana-medium.onnx.json"
+    echo ">> Downloading gyro voice to $MODEL_DIR ..."
+    sudo curl -L -o "$MODEL_PATH"        "$BASE/fa_IR-gyro-medium.onnx"
+    sudo curl -L -o "$MODEL_PATH.json"   "$BASE/fa_IR-gyro-medium.onnx.json"
 fi
 
 # 4) Postgres (create role + db if missing). Requires local postgres superuser access.

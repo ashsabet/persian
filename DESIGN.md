@@ -141,15 +141,15 @@ Decision: generate all audio with an **open-source TTS model running on the home
 | Voice | Source | Notes |
 |---|---|---|
 | **fa_IR-amir-medium** | rhasspy/piper-voices | Official Persian male voice; clear, solid baseline |
-| **fa_IR-gyro-medium** | rhasspy/piper-voices | Official Persian voice; alternative timbre |
-| **Mana-Persian-Piper** ✅ **(chosen)** | MahtaFetrat (fine-tuned on ManaTTS) | Newer, fine-tuned on the 114-hr ManaTTS dataset; the most natural of the three — **selected voice** |
+| **fa_IR-gyro-medium** ✅ **(chosen)** | rhasspy/piper-voices | Official Persian voice; clean and intelligible — **selected voice** |
+| **Mana-Persian-Piper** ❌ | MahtaFetrat (fine-tuned on ManaTTS) | Most natural in theory, but its `training_dir` ONNX export produced unintelligible/noisy audio on this piper+onnxruntime build — not used |
 
 Supporting data if we ever want to fine-tune our own voice: **ManaTTS** — largest open Persian speech dataset, 114+ hrs, **CC0** license.
 
-**Quality expectation:** clear and intelligible, a noticeable step below premium cloud neural voices in expressiveness — acceptable for a learning app where clarity matters most. **Voice decided: Mana-Persian-Piper.**
+**Quality expectation:** clear and intelligible, a noticeable step below premium cloud neural voices in expressiveness — acceptable for a learning app where clarity matters most. **Voice decided: fa_IR-gyro-medium** (official rhasspy voice). The Mana fine-tuned export was tried first but came out unintelligible on this stack.
 
 **Pipeline:**
-1. Install Piper on the server (CPU); download the **Mana-Persian** fa_IR voice.
+1. Install Piper on the server (CPU); download the **gyro** fa_IR voice.
 2. A build script walks every `Word`/`Sentence` row and renders **normal + slow** speed clips (Piper exposes a length/speed parameter), output as OGG/MP3 keyed by content ID.
 3. Files are written to a media directory served statically by **Apache**; the DB stores the relative path on each `MediaAsset`.
 4. The script is idempotent/re-runnable so new content or a voice swap just regenerates what changed.
@@ -205,7 +205,7 @@ This is a sketch for review — we'll firm it up before writing code.
 1. **Persian variety & register:** standard Tehrani Persian, neutral/polite register (shomā) as default? (Recommended.)
 2. **Transliteration:** show Latin transliteration as a training-wheel that fades out, or script-only from early on?
 3. **Hearts:** keep the optional, default-off mistake limiter as a setting, or drop it entirely?
-4. **TTS voice:** ✅ Decided — fully-local Piper with the **Mana-Persian** fine-tuned voice (§3.3).
+4. **TTS voice:** ✅ Decided — fully-local Piper, **fa_IR-gyro-medium** voice (the Mana export was unintelligible on this stack; §3.3).
 5. **Auth:** plain email/password for MVP, or add Google sign-in?
 
 ---

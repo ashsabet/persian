@@ -3,7 +3,7 @@
 Target: your homelab Ubuntu server (Postgres + Apache already running), reachable
 via VPN at 192.168.1.10 and published at https://persian.ashkon.net. The app runs
 under Gunicorn; Apache reverse-proxies it and serves static/media. All Persian
-audio is generated **locally** with the Mana Piper voice — no cloud, no runtime
+audio is generated **locally** with the gyro Piper voice — no cloud, no runtime
 network calls.
 
 ## Quick path (scripted)
@@ -17,7 +17,7 @@ nano .env                 # if it exists; otherwise setup.sh creates it from .en
 bash deploy/setup.sh
 ```
 
-`setup.sh` creates the virtualenv, installs deps, downloads the Mana voice, ensures
+`setup.sh` creates the virtualenv, installs deps, downloads the gyro voice, ensures
 the Postgres role/db, runs migrations, collects static, seeds Unit 1, and generates
 all audio. Then follow the printed steps to install the systemd + Apache units.
 
@@ -25,14 +25,14 @@ all audio. Then follow the printed steps to install the systemd + Apache units.
 
 1. **Code** → `/opt/persian/webapp`.
 2. **Env**: `cp .env.example .env` and set a real `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=0`,
-   the `POSTGRES_*` values, and `PIPER_MODEL=/opt/piper/voices/fa_IR-mana-medium.onnx`.
+   the `POSTGRES_*` values, and `PIPER_MODEL=/opt/piper/voices/fa_IR-gyro-medium.onnx`.
 3. **Virtualenv**: `python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt`.
 4. **Piper voice** (MIT license):
    ```bash
    sudo mkdir -p /opt/piper/voices
-   B=https://huggingface.co/MahtaFetrat/Mana-Persian-Piper/resolve/main
-   sudo curl -L -o /opt/piper/voices/fa_IR-mana-medium.onnx       $B/fa_IR-mana-medium.onnx
-   sudo curl -L -o /opt/piper/voices/fa_IR-mana-medium.onnx.json  $B/fa_IR-mana-medium.onnx.json
+   B=https://huggingface.co/rhasspy/piper-voices/resolve/main/fa/fa_IR/gyro/medium
+   sudo curl -L -o /opt/piper/voices/fa_IR-gyro-medium.onnx       $B/fa_IR-gyro-medium.onnx
+   sudo curl -L -o /opt/piper/voices/fa_IR-gyro-medium.onnx.json  $B/fa_IR-gyro-medium.onnx.json
    ```
 5. **Postgres**:
    ```bash
@@ -44,7 +44,7 @@ all audio. Then follow the printed steps to install the systemd + Apache units.
    python manage.py migrate
    python manage.py collectstatic --noinput
    python manage.py seed_content
-   python manage.py generate_audio          # renders Mana audio (CPU, a few minutes)
+   python manage.py generate_audio          # renders gyro audio (CPU, a few minutes)
    python manage.py createsuperuser         # your admin login for /admin
    ```
 7. **Gunicorn service**:
@@ -64,7 +64,7 @@ all audio. Then follow the printed steps to install the systemd + Apache units.
 ## Verify
 
 - Visit https://persian.ashkon.net → log in as **demo / persian123**.
-- Play a lesson; the 🔊 buttons should speak Persian (Mana voice).
+- Play a lesson; the 🔊 buttons should speak Persian (gyro voice).
 - `/admin` is your content CMS for adding the rest of the curriculum.
 
 ## Updating later
