@@ -1,4 +1,3 @@
-import json
 
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
@@ -70,7 +69,7 @@ def lesson(request, slug):
     ]
     context = {
         "lesson": lesson_obj,
-        "exercises_json": json.dumps(exercises),
+        "exercises": exercises,
         "show_translit": lesson_obj.show_transliteration,
     }
     return render(request, "learn/lesson.html", context)

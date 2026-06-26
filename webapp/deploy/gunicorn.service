@@ -1,19 +1,22 @@
 # systemd unit for the Persian webapp (Gunicorn/WSGI).
 # Install: sudo cp deploy/gunicorn.service /etc/systemd/system/persian.service
 #          sudo systemctl daemon-reload && sudo systemctl enable --now persian
-# Adjust User, paths, and the bind port to match your server.
+#
+# NOTE (live deploy on linux-surface): cloned to /opt/persian/persian/webapp,
+# runs as user 'ashkon', and binds 127.0.0.1:8017 (port 8001 is used by the
+# household-tracker app on the same server). Adjust paths/port for your host.
 
 [Unit]
 Description=Persian language webapp (Gunicorn)
 After=network.target postgresql.service
 
 [Service]
-User=www-data
-Group=www-data
-WorkingDirectory=/opt/persian/webapp
-EnvironmentFile=/opt/persian/webapp/.env
-ExecStart=/opt/persian/webapp/.venv/bin/gunicorn config.wsgi:application \
-    --bind 127.0.0.1:8001 \
+User=ashkon
+Group=ashkon
+WorkingDirectory=/opt/persian/persian/webapp
+EnvironmentFile=/opt/persian/persian/webapp/.env
+ExecStart=/opt/persian/persian/webapp/.venv/bin/gunicorn config.wsgi:application \
+    --bind 127.0.0.1:8017 \
     --workers 3 \
     --timeout 60
 Restart=on-failure

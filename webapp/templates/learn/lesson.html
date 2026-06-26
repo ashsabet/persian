@@ -24,7 +24,7 @@
     {% csrf_token %}
   </form>
 
-  {{ exercises_json|json_script:"exercises-data" }}
+  {{ exercises|json_script:"exercises-data" }}
   <script>
     window.LESSON = {
       checkUrlTemplate: "{% url 'check' 0 %}".replace("/0/", "/__ID__/"),
