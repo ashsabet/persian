@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Persian{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'learn/css/app.css' %}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{% url 'home' %}">پارسی <span>Persian</span></a>
+    <nav>
+      {% if user.is_authenticated %}
+        <span class="streak" title="Day streak">🔥 {{ user.profile.streak_count }}</span>
+        <a href="{% url 'profile' %}">Profile</a>
+        <form action="{% url 'logout' %}" method="post" class="inline">{% csrf_token %}
+          <button type="submit" class="linklike">Log out</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}">Log in</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

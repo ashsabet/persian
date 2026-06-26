@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Your progress{% endblock %}
+{% block content %}
+  <div class="card">
+    <h2>{{ user.username }}</h2>
+    <div class="stat-row">
+      <div class="stat"><div class="n">🔥 {{ profile.streak_count }}</div><div class="l">day streak</div></div>
+      <div class="stat"><div class="n">{{ profile.words_learned }}</div><div class="l">words learned</div></div>
+      <div class="stat"><div class="n">{{ lessons_done }}/{{ lessons_total }}</div><div class="l">lessons done</div></div>
+    </div>
+
+    <h3>Course progress</h3>
+    {% for s in section_progress %}
+      <div style="display:flex;justify-content:space-between"><span>{{ s.title }}</span><b>{{ s.pct }}%</b></div>
+      <div class="bar"><i style="width:{{ s.pct }}%"></i></div>
+    {% endfor %}
+  </div>
+{% endblock %}

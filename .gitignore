@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Django runtime artifacts (do not commit)
+webapp/db.sqlite3
+webapp/db.sqlite3-journal
+webapp/staticfiles/
+webapp/media/
+webapp/.env
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Sign up{% endblock %}
+{% block content %}
+  <div class="card" style="max-width:420px;margin:30px auto">
+    <h2 class="center">Create your account</h2>
+    <form method="post">{% csrf_token %}
+      {% for field in form %}
+        <div class="formrow">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<div class="muted" style="font-size:12px">{{ field.help_text|safe }}</div>{% endif %}
+          {% for error in field.errors %}<div class="errorlist">{{ error }}</div>{% endfor %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn block">Sign up</button>
+    </form>
+    <p class="center muted" style="margin-top:14px">
+      Already have an account? <a href="{% url 'login' %}">Log in</a>
+    </p>
+  </div>
+{% endblock %}

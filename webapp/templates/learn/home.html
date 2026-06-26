@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Learn Persian{% endblock %}
+{% block content %}
+  {% for section in sections %}
+    <div class="section-title">{{ section.obj.title }}</div>
+    {% for unit in section.units %}
+      <div class="unit-title">{{ unit.obj.title }}</div>
+      <div class="path">
+        {% for item in unit.lessons %}
+          {% if item.open %}
+            <a class="node {% if item.done %}done{% elif item.current %}current{% endif %}"
+               href="{% url 'lesson' item.obj.slug %}">
+              <span class="bubble">{% if item.done %}✓{% else %}▶{% endif %}</span>
+              <span class="label">{{ item.obj.title }}</span>
+            </a>
+          {% else %}
+            <span class="node locked">
+              <span class="bubble">🔒</span>
+              <span class="label">{{ item.obj.title }}</span>
+            </span>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endfor %}
+  {% empty %}
+    <div class="card center">
+      <p>No content yet. Run <code>python manage.py seed_content</code> to load Unit 1.</p>
+    </div>
+  {% endfor %}
+{% endblock %}

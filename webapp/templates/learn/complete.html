@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Lesson complete{% endblock %}
+{% block content %}
+  <div class="card center">
+    <div class="big">Lesson complete! 🎉</div>
+    <div class="stat-row">
+      <div class="stat"><div class="n">🔥 {{ profile.streak_count }}</div><div class="l">day streak</div></div>
+      <div class="stat"><div class="n">{{ profile.words_learned }}</div><div class="l">words learned</div></div>
+    </div>
+    <p class="muted">Daily goal met ✓</p>
+    {% if next_slug %}
+      <a class="btn block" href="{% url 'lesson' next_slug %}">Continue</a>
+    {% else %}
+      <a class="btn block" href="{% url 'home' %}">Back to path</a>
+    {% endif %}
+    <p style="margin-top:12px"><a href="{% url 'home' %}">Back to path</a></p>
+  </div>
+{% endblock %}
