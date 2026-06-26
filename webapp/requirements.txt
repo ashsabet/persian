@@ -1,6 +1,7 @@
 Django>=5.0,<5.2
 gunicorn>=21.2
 psycopg2-binary>=2.9
+scipy>=1.10
 python-dotenv>=1.0
 # Installed on the server for audio generation (not needed for the web process):
 piper-tts>=1.2
