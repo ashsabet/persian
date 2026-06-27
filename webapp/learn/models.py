@@ -119,12 +119,10 @@ class Exercise(models.Model):
         """Return True if `submitted` is correct for this exercise."""
         p = self.payload or {}
         if self.kind in {self.Kind.MULTIPLE_CHOICE, self.Kind.LISTEN, self.Kind.SCRIPT}:
-            # Options are [{text, correct}]; submitted is the chosen index (as str/int).
-            try:
-                idx = int(submitted)
-                return bool(p["options"][idx].get("correct"))
-            except (TypeError, ValueError, IndexError, KeyError):
-                return False
+            # Options are [{text, correct}]; submitted is the chosen option's TEXT,
+            # so checking is independent of display order (options are shuffled).
+            correct = next((o.get("text") for o in p.get("options", []) if o.get("correct")), None)
+            return correct is not None and _normalize(submitted) == _normalize(correct)
         if self.kind == self.Kind.TRANSLATE:
             return _normalize(submitted) == _normalize(p.get("answer", ""))
         if self.kind == self.Kind.SPEAK:

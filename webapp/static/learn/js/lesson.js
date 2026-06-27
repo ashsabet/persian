@@ -15,6 +15,7 @@
   let idx = 0;
   let getAnswer = () => null;     // set by each renderer
   let answered = false;
+  let speakMode = false;         // speak items are not graded — just "continue"
 
   function audioUrl(key, slow) {
     return cfg.mediaBase + key + (slow ? "-slow" : "") + ".wav";
@@ -61,13 +62,13 @@
   function renderOptionGrid(ex, optionClassFa) {
     const grid = el("div", "options");
     let selected = null;
-    ex.options.forEach((opt, i) => {
+    ex.options.forEach((opt) => {
       const o = el("div", "option" + (optionClassFa ? " fa" : ""), opt.text);
       o.onclick = () => {
         if (answered) return;
         grid.querySelectorAll(".option").forEach((n) => n.classList.remove("selected"));
         o.classList.add("selected");
-        selected = i;
+        selected = opt.text;          // submit by TEXT, not position
         setReady(true);
       };
       grid.appendChild(o);
@@ -78,9 +79,11 @@
 
   function render() {
     answered = false;
+    speakMode = false;
     setReady(false);
     elFeedback.style.display = "none";
     elCheck.style.display = "block";
+    elCheck.textContent = "Check";
     elExercise.innerHTML = "";
     const ex = data[idx];
     elBar.style.width = Math.round((idx / data.length) * 100) + "%";
@@ -117,7 +120,6 @@
       }
       const answerArea = el("div", "answer-area");
       const bank = el("div", "bank");
-      const chosen = [];
       (ex.tokens || []).forEach((tok) => {
         const t = el("div", "token" + (faFirst ? "" : " fa"), tok);
         t.onclick = () => {
@@ -132,33 +134,30 @@
             sync();
           };
           answerArea.appendChild(placed);
-          chosen.push(placed);
           sync();
         };
         bank.appendChild(t);
       });
       function sync() {
-        const words = Array.from(answerArea.children).map((c) => c.textContent);
-        setReady(words.length > 0);
+        setReady(answerArea.children.length > 0);
       }
       getAnswer = () => Array.from(answerArea.children).map((c) => c.textContent).join(" ");
       elExercise.appendChild(answerArea);
       elExercise.appendChild(bank);
 
     } else if (ex.kind === "speak") {
+      // Not graded — we don't pretend to assess. Just prompt and continue.
       elExercise.appendChild(el("div", "prompt-fa fa", ex.prompt_fa));
       if (cfg.showTranslit && ex.translit) elExercise.appendChild(el("div", "translit center", ex.translit));
       if (ex.english) elExercise.appendChild(el("div", "center muted", ex.english));
       elExercise.appendChild(audioButton(ex.audio, { slow: true, autoplay: true }));
-      const mic = el("div", "center");
-      const b = el("button", "audio-btn", "🎙");
-      b.type = "button";
-      b.style.margin = "16px auto";
-      b.onclick = () => setReady(true);
-      mic.appendChild(b);
-      mic.appendChild(el("div", "muted", "Tap the mic, say it aloud, then Check"));
-      elExercise.appendChild(mic);
-      getAnswer = () => "spoken";
+      const hint = el("div", "center muted");
+      hint.style.margin = "16px 0";
+      hint.textContent = "🗣️ Listen, then say it aloud — then continue.";
+      elExercise.appendChild(hint);
+      speakMode = true;
+      elCheck.textContent = "Continue";
+      setReady(true);
     }
   }
 
@@ -167,10 +166,7 @@
     elCheck.style.display = "none";
     elFeedback.className = "feedback " + (correct ? "ok" : "no");
     elFeedback.style.display = "block";
-    elFeedbackMsg.textContent = correct
-      ? "Correct!"
-      : "Answer: " + (correctAnswer || "");
-    // Mark options when present
+    elFeedbackMsg.textContent = correct ? "Correct!" : "Answer: " + (correctAnswer || "");
     const opts = elExercise.querySelectorAll(".option");
     const ex = data[idx];
     if (opts.length && ex.options) {
@@ -182,7 +178,18 @@
     }
   }
 
+  function advance() {
+    idx += 1;
+    if (idx >= data.length) {
+      elBar.style.width = "100%";
+      document.getElementById("finish-form").submit();
+    } else {
+      render();
+    }
+  }
+
   elCheck.onclick = function () {
+    if (speakMode) { advance(); return; }     // speak: just move on
     const ex = data[idx];
     const answer = getAnswer();
     const url = cfg.checkUrlTemplate.replace("__ID__", ex.id);
@@ -198,20 +205,7 @@
       .catch(() => showFeedback(false, ""));
   };
 
-  elContinue.onclick = function () {
-    idx += 1;
-    if (idx >= data.length) {
-      elBar.style.width = "100%";
-      document.getElementById("finish-form").submit();
-    } else {
-      render();
-    }
-  };
+  elContinue.onclick = advance;
 
   if (data.length === 0) {
-    elExercise.appendChild(el("div", "center", "This lesson has no exercises yet."));
-    elCheck.style.display = "none";
-  } else {
-    render();
-  }
-})();
+    elExercise.appendChild(el("div", "center", "This lesson

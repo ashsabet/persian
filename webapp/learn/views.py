@@ -1,4 +1,6 @@
 
+import random
+
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
@@ -63,10 +65,14 @@ def home(request):
 @login_required
 def lesson(request, slug):
     lesson_obj = get_object_or_404(Lesson, slug=slug)
-    exercises = [
-        {"id": ex.id, "kind": ex.kind, **(ex.payload or {})}
-        for ex in lesson_obj.exercises.all()
-    ]
+    exercises = []
+    for ex in lesson_obj.exercises.all():
+        data = {"id": ex.id, "kind": ex.kind, **(ex.payload or {})}
+        if isinstance(data.get("options"), list):
+            opts = list(data["options"])
+            random.shuffle(opts)          # randomize so the answer isn't always first
+            data["options"] = opts
+        exercises.append(data)
     context = {
         "lesson": lesson_obj,
         "exercises": exercises,
