@@ -3,7 +3,7 @@ import random
 
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
+from .forms import RegisterForm
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -178,11 +178,11 @@ def register(request):
     if request.user.is_authenticated:
         return redirect("home")
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
             return redirect("home")
     else:
-        form = UserCreationForm()
+        form = RegisterForm()
     return render(request, "registration/register.html", {"form": form})

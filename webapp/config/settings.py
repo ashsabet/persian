@@ -117,5 +117,18 @@ LOGOUT_REDIRECT_URL = "login"
 # Path to the Piper voice model used by the generate_audio command.
 PIPER_MODEL = os.environ.get("PIPER_MODEL", "")
 
+# Email — used for password-reset links. If EMAIL_HOST is set we send via SMTP;
+# otherwise messages are printed to the console/log (fine for testing, single-user).
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
+if EMAIL_HOST:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+    EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+    EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+    EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+    EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", default=True)
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Persian <no-reply@persian.ashkon.net>")
+
 # Behind Apache reverse proxy terminating TLS.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

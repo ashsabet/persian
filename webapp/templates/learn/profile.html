@@ -3,6 +3,7 @@
 {% block content %}
   <div class="card">
     <h2>{{ user.username }}</h2>
+    <p><a href="{% url 'password_change' %}">Change password</a></p>
     <div class="stat-row">
       <div class="stat"><div class="n">🔥 {{ profile.streak_count }}</div><div class="l">day streak</div></div>
       <div class="stat"><div class="n">{{ profile.words_learned }}</div><div class="l">words learned</div></div>
