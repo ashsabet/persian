@@ -208,4 +208,9 @@
   elContinue.onclick = advance;
 
   if (data.length === 0) {
-    elExercise.appendChild(el("div", "center", "This lesson
+    elExercise.appendChild(el("div", "center", "This lesson has no exercises yet."));
+    elCheck.style.display = "none";
+  } else {
+    render();
+  }
+})();
