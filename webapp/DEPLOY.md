@@ -75,7 +75,9 @@ source .venv/bin/activate
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py collectstatic --noinput
-python manage.py generate_audio           # renders only new/missing clips
+python manage.py install_audio            # copy recorded (Shahrzad) clips into media/audio
+python manage.py seed_content             # rebuild alphabet lessons from learn/data/alphabet.csv
+python manage.py generate_audio           # (optional) render gyro TTS for non-alphabet vocab
 sudo systemctl restart persian
 ```
 
