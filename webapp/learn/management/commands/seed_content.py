@@ -1,145 +1,111 @@
 """
-Seed the database with Section 0, Unit 1 of the Persian course (the vertical slice).
-Idempotent: safe to run repeatedly. Also creates a demo learner account.
+Seed Section 0 — the Persian alphabet — from the recorded native-speaker clips
+(voice: Shahrzad). Reads learn/data/alphabet.csv and builds one lesson per
+letter (name -> sound -> example words), referencing the recorded audio keys.
+The audio files (name-*.wav, sound-*.wav, word-*-*.wav) are the human recordings
+placed under MEDIA_ROOT/audio (see DEPLOY). Rebuilds all content on each run.
 
     python manage.py seed_content
 """
+import csv
+import random
+from collections import OrderedDict
+from pathlib import Path
+
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
-from learn.models import Exercise, Lesson, Section, Unit, Word
+from learn.models import Exercise, Lesson, Section, Unit
 
-# Vocabulary + letters (audio_key -> text to synthesize). Letters are stored as
-# Words so the audio pipeline can render them generically.
-WORDS = [
-    # letters
-    ("letter-a", "آ", "ā", "letter alef"),
-    ("letter-be", "ب", "be", "letter be"),
-    ("letter-pe", "پ", "pe", "letter pe"),
-    ("letter-te", "ت", "te", "letter te"),
-    # words
-    ("word-ab", "آب", "āb", "water"),
-    ("word-baba", "بابا", "bābā", "dad"),
-    ("word-pa", "پا", "pā", "foot"),
-    ("word-tab", "تب", "tab", "fever"),
-]
+DATA = Path(settings.BASE_DIR) / "learn" / "data" / "alphabet.csv"
+VOICE = "Shahrzad"
+LETTERS_PER_UNIT = 4
 
-LESSON_1 = [
-    {
-        "kind": "script",
-        "instruction": "Tap the initial (joining) form of this letter.",
-        "prompt_fa": "ب", "audio": "letter-be",
-        "options": [{"text": "بـ", "correct": True}, {"text": "ـبـ"}, {"text": "ـب"}, {"text": "ب"}],
-    },
-    {
-        "kind": "mc",
-        "instruction": "Which letter makes the “p” sound?",
-        "audio": "letter-pe",
-        "options": [{"text": "پ", "correct": True}, {"text": "ب"}, {"text": "ت"}, {"text": "آ"}],
-    },
-    {
-        "kind": "mc",
-        "instruction": "Which letter is “t”?",
-        "audio": "letter-te",
-        "options": [{"text": "ت", "correct": True}, {"text": "ب"}, {"text": "پ"}, {"text": "آ"}],
-    },
-    {
-        "kind": "listen",
-        "instruction": "Tap what you hear.",
-        "audio": "word-ab",
-        "options": [{"text": "آب", "correct": True}, {"text": "بابا"}, {"text": "پا"}, {"text": "تب"}],
-    },
-    {
-        "kind": "translate", "direction": "fa_en",
-        "instruction": "Translate this word.",
-        "prompt_fa": "آب", "translit": "āb", "audio": "word-ab",
-        "answer": "water", "tokens": ["water", "father", "foot", "fever"],
-    },
-]
 
-LESSON_2 = [
-    {
-        "kind": "mc",
-        "instruction": "Which word means “water”?",
-        "audio": "word-ab",
-        "options": [{"text": "آب", "correct": True}, {"text": "بابا"}, {"text": "پا"}, {"text": "تب"}],
-    },
-    {
-        "kind": "translate", "direction": "en_fa",
-        "instruction": "Say “dad” in Persian.",
-        "prompt_en": "dad",
-        "answer": "بابا", "tokens": ["بابا", "آب", "پا", "تب"],
-    },
-    {
-        "kind": "listen",
-        "instruction": "Tap what you hear.",
-        "audio": "word-baba",
-        "options": [{"text": "بابا", "correct": True}, {"text": "پا"}, {"text": "تب"}, {"text": "آب"}],
-    },
-    {
-        "kind": "speak",
-        "instruction": "Listen, then say it aloud.",
-        "prompt_fa": "بابا", "translit": "bābā", "english": "dad", "audio": "word-baba",
-    },
-    {
-        "kind": "translate", "direction": "fa_en",
-        "instruction": "Translate this word.",
-        "prompt_fa": "پا", "translit": "pā", "audio": "word-pa",
-        "answer": "foot", "tokens": ["foot", "water", "fever", "father"],
-    },
-]
+def load_letters():
+    letters = OrderedDict()
+    with open(DATA, encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            g = r["letter"]
+            L = letters.setdefault(g, {"glyph": g, "name": None, "sound": None, "words": []})
+            e = {"key": r["audio_key"], "fa": r["persian"],
+                 "tr": r["transliteration"], "en": r["english_or_note"]}
+            t = r["type"]
+            if t == "name":
+                L["name"] = e
+            elif t == "sound":
+                L["sound"] = e
+            else:
+                L["words"].append(e)
+    return list(letters.values())
 
 
 class Command(BaseCommand):
-    help = "Seed Section 0 / Unit 1 content and a demo account."
+    help = "Seed the Persian alphabet (Section 0) from recorded Shahrzad clips."
 
     @transaction.atomic
     def handle(self, *args, **options):
-        for key, persian, translit, english in WORDS:
-            Word.objects.update_or_create(
-                audio_key=key,
-                defaults={
-                    "persian": persian, "transliteration": translit, "english": english,
-                    "source": "original", "license": "project-original",
-                },
-            )
+        letters = load_letters()
+        glyphs = [L["glyph"] for L in letters]
+        all_word_fa = [w["fa"] for L in letters for w in L["words"]]
+        all_word_en = list({w["en"] for L in letters for w in L["words"]})
+        rng = random.Random(42)
 
-        section, _ = Section.objects.update_or_create(
-            slug="script", defaults={"order": 0, "title": "The Persian Script",
-                                     "description": "Read and write the alphabet."}
-        )
-        unit, _ = Unit.objects.update_or_create(
-            slug="u1-first-letters", defaults={"section": section, "order": 1,
-                                               "title": "Unit 1 · First letters & sounds"}
-        )
+        def glyph_opts(correct):
+            opts = [correct] + rng.sample([g for g in glyphs if g != correct], 3)
+            return [{"text": o, "correct": o == correct} for o in opts]
 
-        for l_order, (slug, title, payloads) in enumerate(
-            [
-                ("l1-letters", "Letters: ا ب پ ت", LESSON_1),
-                ("l2-first-words", "First words", LESSON_2),
-            ],
-            start=1,
-        ):
-            lesson, _ = Lesson.objects.update_or_create(
-                slug=slug,
-                defaults={"unit": unit, "order": l_order, "title": title,
-                          "show_transliteration": True},
-            )
-            lesson.exercises.all().delete()
-            for e_order, payload in enumerate(payloads, start=1):
-                kind = payload.pop("kind")
-                Exercise.objects.create(lesson=lesson, order=e_order, kind=kind, payload=payload)
+        def word_opts(correct_fa):
+            opts = [correct_fa] + rng.sample([w for w in all_word_fa if w != correct_fa], 3)
+            return [{"text": o, "correct": o == correct_fa} for o in opts]
 
-        demo, created = User.objects.get_or_create(
-            username="demo", defaults={"email": "demo@example.com"}
-        )
+        def en_tokens(correct_en):
+            pool = [e for e in all_word_en if e != correct_en]
+            toks = [correct_en] + rng.sample(pool, min(3, len(pool)))
+            rng.shuffle(toks)
+            return toks
+
+        Section.objects.all().delete()  # rebuild everything (progress cascades)
+        sec = Section.objects.create(slug="script", order=0, title="The Persian Script",
+                                     description="Learn to read and pronounce all 32 letters.")
+
+        unit = None
+        for li, L in enumerate(letters):
+            if li % LETTERS_PER_UNIT == 0:
+                ui = li // LETTERS_PER_UNIT
+                grp = "".join(x["glyph"] for x in letters[li:li + LETTERS_PER_UNIT])
+                unit = Unit.objects.create(section=sec, order=ui + 1,
+                                           slug=f"u{ui + 1}-script", title=f"Unit {ui + 1} · {grp}")
+            g, name, sound, words = L["glyph"], L["name"], L["sound"], L["words"]
+            slug = name["key"][len("name-"):]
+            lesson = Lesson.objects.create(unit=unit, order=li + 1, slug=f"ltr-{slug}",
+                                           title=f"{g} — {name['tr']}", show_transliteration=True)
+            exs = []
+            exs.append(("speak", {
+                "instruction": f"This is the letter {g}. Its name is “{name['tr']}”. Listen and repeat.",
+                "prompt_fa": g, "translit": name["tr"], "english": "the letter's name", "audio": name["key"]}))
+            exs.append(("listen", {"instruction": "Which letter has this name?",
+                                   "audio": name["key"], "options": glyph_opts(g)}))
+            exs.append(("listen", {"instruction": "Which letter makes this sound?",
+                                   "audio": sound["key"], "options": glyph_opts(g)}))
+            for w in words[:2]:
+                exs.append(("listen", {"instruction": "Tap the word you hear.",
+                                       "audio": w["key"], "options": word_opts(w["fa"])}))
+            w0 = words[0]
+            exs.append(("translate", {"instruction": "What does this word mean?", "direction": "fa_en",
+                                      "prompt_fa": w0["fa"], "translit": w0["tr"], "audio": w0["key"],
+                                      "answer": w0["en"], "tokens": en_tokens(w0["en"])}))
+            for i, (kind, payload) in enumerate(exs, 1):
+                payload["voice"] = VOICE
+                Exercise.objects.create(lesson=lesson, order=i, kind=kind, payload=payload)
+
+        demo, created = User.objects.get_or_create(username="demo", defaults={"email": "demo@example.com"})
         if created:
             demo.set_password("persian123")
             demo.save()
-            self.stdout.write(self.style.SUCCESS("Created demo account: demo / persian123"))
 
         self.stdout.write(self.style.SUCCESS(
-            f"Seeded {Word.objects.count()} words, "
-            f"{Lesson.objects.count()} lessons, {Exercise.objects.count()} exercises."
-        ))
+            f"Seeded {Section.objects.count()} section, {Unit.objects.count()} units, "
+            f"{Lesson.objects.count()} lessons, {Exercise.objects.count()} exercises (voice: {VOICE})."))

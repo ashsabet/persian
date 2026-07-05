@@ -1,0 +1,129 @@
+index,audio_key,type,persian,transliteration,english_or_note,letter
+1,name-alef,name,الف,alef,name of letter ا,ا
+2,sound-alef,sound,آ,ā,sound of ا (with a/e/o),ا
+3,word-alef-ab,word,آب,āb,water,ا
+4,word-alef-anar,word,انار,anār,pomegranate,ا
+5,name-be,name,بِ,be,name of letter ب,ب
+6,sound-be,sound,بَ بِ بُ,ba · be · bo,sound of ب (with a/e/o),ب
+7,word-be-baba,word,بابا,bābā,dad,ب
+8,word-be-barf,word,برف,barf,snow,ب
+9,name-pe,name,پِ,pe,name of letter پ,پ
+10,sound-pe,sound,پَ پِ پُ,pa · pe · po,sound of پ (with a/e/o),پ
+11,word-pe-pedar,word,پدر,pedar,father,پ
+12,word-pe-pa,word,پا,pā,foot,پ
+13,name-te,name,تِ,te,name of letter ت,ت
+14,sound-te,sound,تَ تِ تُ,ta · te · to,sound of ت (with a/e/o),ت
+15,word-te-tup,word,توپ,tup,ball,ت
+16,word-te-taj,word,تاج,tāj,crown,ت
+17,name-se,name,ثِ,se,name of letter ث,ث
+18,sound-se,sound,ثَ ثِ ثُ,sa · se · so,sound of ث (with a/e/o),ث
+19,word-se-saniye,word,ثانیه,sāniye,second,ث
+20,word-se-servat,word,ثروت,servat,wealth,ث
+21,name-jim,name,جیم,jim,name of letter ج,ج
+22,sound-jim,sound,جَ جِ جُ,ja · je · jo,sound of ج (with a/e/o),ج
+23,word-jim-juje,word,جوجه,juje,chick,ج
+24,word-jim-jangal,word,جنگل,jangal,forest,ج
+25,name-che,name,چِ,che,name of letter چ,چ
+26,sound-che,sound,چَ چِ چُ,cha · che · cho,sound of چ (with a/e/o),چ
+27,word-che-chay,word,چای,chāy,tea,چ
+28,word-che-cheshm,word,چشم,cheshm,eye,چ
+29,name-he-jimi,name,حِ,he (hā-ye jimi),name of letter ح,ح
+30,sound-he-jimi,sound,حَ حِ حُ,ha · he · ho,sound of ح (with a/e/o),ح
+31,word-he-jimi-hammam,word,حمام,hammām,bath,ح
+32,word-he-jimi-heyvan,word,حیوان,heyvān,animal,ح
+33,name-khe,name,خِ,khe,name of letter خ,خ
+34,sound-khe,sound,خَ خِ خُ,kha · khe · kho,sound of خ (with a/e/o),خ
+35,word-khe-khane,word,خانه,khāne,house,خ
+36,word-khe-khorshid,word,خورشید,khorshid,sun,خ
+37,name-dal,name,دال,dāl,name of letter د,د
+38,sound-dal,sound,دَ دِ دُ,da · de · do,sound of د (with a/e/o),د
+39,word-dal-dar,word,در,dar,door,د
+40,word-dal-dast,word,دست,dast,hand,د
+41,name-zal,name,ذال,zāl,name of letter ذ,ذ
+42,sound-zal,sound,ذَ ذِ ذُ,za · ze · zo,sound of ذ (with a/e/o),ذ
+43,word-zal-zorrat,word,ذرت,zorrat,corn,ذ
+44,word-zal-zehn,word,ذهن,zehn,mind,ذ
+45,name-re,name,رِ,re,name of letter ر,ر
+46,sound-re,sound,رَ رِ رُ,ra · re · ro,sound of ر (with a/e/o),ر
+47,word-re-ruz,word,روز,ruz,day,ر
+48,word-re-rang,word,رنگ,rang,color,ر
+49,name-ze,name,زِ,ze,name of letter ز,ز
+50,sound-ze,sound,زَ زِ زُ,za · ze · zo,sound of ز (with a/e/o),ز
+51,word-ze-zan,word,زن,zan,woman,ز
+52,word-ze-zamin,word,زمین,zamin,ground,ز
+53,name-zhe,name,ژِ,zhe,name of letter ژ,ژ
+54,sound-zhe,sound,ژَ ژِ ژُ,zha · zhe · zho,sound of ژ (with a/e/o),ژ
+55,word-zhe-zhele,word,ژله,zhele,jelly,ژ
+56,word-zhe-zhaket,word,ژاکت,zhāket,jacket,ژ
+57,name-sin,name,سین,sin,name of letter س,س
+58,sound-sin,sound,سَ سِ سُ,sa · se · so,sound of س (with a/e/o),س
+59,word-sin-sib,word,سیب,sib,apple,س
+60,word-sin-sag,word,سگ,sag,dog,س
+61,name-shin,name,شین,shin,name of letter ش,ش
+62,sound-shin,sound,شَ شِ شُ,sha · she · sho,sound of ش (with a/e/o),ش
+63,word-shin-shab,word,شب,shab,night,ش
+64,word-shin-shir,word,شیر,shir,milk/lion,ش
+65,name-sad,name,صاد,sād,name of letter ص,ص
+66,sound-sad,sound,صَ صِ صُ,sa · se · so,sound of ص (with a/e/o),ص
+67,word-sad-sobh,word,صبح,sobh,morning,ص
+68,word-sad-sandali,word,صندلی,sandali,chair,ص
+69,name-zad,name,ضاد,zād,name of letter ض,ض
+70,sound-zad,sound,ضَ ضِ ضُ,za · ze · zo,sound of ض (with a/e/o),ض
+71,word-zad-zaif,word,ضعیف,za'if,weak,ض
+72,word-zad-zarbe,word,ضربه,zarbe,a hit,ض
+73,name-ta,name,طا,tā,name of letter ط,ط
+74,sound-ta,sound,طَ طِ طُ,ta · te · to,sound of ط (with a/e/o),ط
+75,word-ta-tuti,word,طوطی,tuti,parrot,ط
+76,word-ta-tala,word,طلا,talā,gold,ط
+77,name-za,name,ظا,zā,name of letter ظ,ظ
+78,sound-za,sound,ظَ ظِ ظُ,za · ze · zo,sound of ظ (with a/e/o),ظ
+79,word-za-zarf,word,ظرف,zarf,dish,ظ
+80,word-za-zohr,word,ظهر,zohr,noon,ظ
+81,name-eyn,name,عین,eyn,name of letter ع,ع
+82,sound-eyn,sound,عَ عِ عُ,a · e · o,sound of ع (with a/e/o),ع
+83,word-eyn-asal,word,عسل,asal,honey,ع
+84,word-eyn-eynak,word,عینک,eynak,glasses,ع
+85,name-gheyn,name,غین,gheyn,name of letter غ,غ
+86,sound-gheyn,sound,غَ غِ غُ,gha · ghe · gho,sound of غ (with a/e/o),غ
+87,word-gheyn-ghaza,word,غذا,ghazā,food,غ
+88,word-gheyn-ghar,word,غار,ghār,cave,غ
+89,name-fe,name,فِ,fe,name of letter ف,ف
+90,sound-fe,sound,فَ فِ فُ,fa · fe · fo,sound of ف (with a/e/o),ف
+91,word-fe-fil,word,فیل,fil,elephant,ف
+92,word-fe-farda,word,فردا,fardā,tomorrow,ف
+93,name-qaf,name,قاف,qāf,name of letter ق,ق
+94,sound-qaf,sound,قَ قِ قُ,qa · qe · qo,sound of ق (with a/e/o),ق
+95,word-qaf-qashoq,word,قاشق,qāshoq,spoon,ق
+96,word-qaf-qermez,word,قرمز,qermez,red,ق
+97,name-kaf,name,کاف,kāf,name of letter ک,ک
+98,sound-kaf,sound,کَ کِ کُ,ka · ke · ko,sound of ک (with a/e/o),ک
+99,word-kaf-ketab,word,کتاب,ketāb,book,ک
+100,word-kaf-kafsh,word,کفش,kafsh,shoe,ک
+101,name-gaf,name,گاف,gāf,name of letter گ,گ
+102,sound-gaf,sound,گَ گِ گُ,ga · ge · go,sound of گ (with a/e/o),گ
+103,word-gaf-gol,word,گل,gol,flower,گ
+104,word-gaf-gorbe,word,گربه,gorbe,cat,گ
+105,name-lam,name,لام,lām,name of letter ل,ل
+106,sound-lam,sound,لَ لِ لُ,la · le · lo,sound of ل (with a/e/o),ل
+107,word-lam-lab,word,لب,lab,lip,ل
+108,word-lam-limu,word,لیمو,limu,lemon,ل
+109,name-mim,name,میم,mim,name of letter م,م
+110,sound-mim,sound,مَ مِ مُ,ma · me · mo,sound of م (with a/e/o),م
+111,word-mim-madar,word,مادر,mādar,mother,م
+112,word-mim-mah,word,ماه,māh,moon,م
+113,name-nun,name,نون,nun,name of letter ن,ن
+114,sound-nun,sound,نَ نِ نُ,na · ne · no,sound of ن (with a/e/o),ن
+115,word-nun-nan,word,نان,nān,bread,ن
+116,word-nun-namak,word,نمک,namak,salt,ن
+117,name-vav,name,واو,vāv,name of letter و,و
+118,sound-vav,sound,وَ وِ وُ,va · ve · vo,sound of و (with a/e/o),و
+119,word-vav-varzesh,word,ورزش,varzesh,sport,و
+120,word-vav-vaqt,word,وقت,vaqt,time,و
+121,name-he,name,هِ,he (hā-ye do-cheshm),name of letter ه,ه
+122,sound-he,sound,هَ هِ هُ,ha · he · ho,sound of ه (with a/e/o),ه
+123,word-he-haft,word,هفت,haft,seven,ه
+124,word-he-hava,word,هوا,havā,weather,ه
+125,name-ye,name,یِ,ye,name of letter ی,ی
+126,sound-ye,sound,یَ یِ یُ,ya · ye · yo,sound of ی (with a/e/o),ی
+127,word-ye-yakh,word,یخ,yakh,ice,ی
+128,word-ye-yek,word,یک,yek,one,ی
