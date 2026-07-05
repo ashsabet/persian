@@ -13,6 +13,7 @@
     <nav>
       {% if user.is_authenticated %}
         <span class="streak" title="Day streak">🔥 {{ user.profile.streak_count }}</span>
+        <a href="{% url 'alphabet' %}">Alphabet</a>
         <a href="{% url 'profile' %}">Profile</a>
         <form action="{% url 'logout' %}" method="post" class="inline">{% csrf_token %}
           <button type="submit" class="linklike">Log out</button>

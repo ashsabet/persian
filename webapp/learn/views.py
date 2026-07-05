@@ -186,3 +186,28 @@ def register(request):
     else:
         form = RegisterForm()
     return render(request, "registration/register.html", {"form": form})
+
+
+@login_required
+def alphabet(request):
+    """Reference chart: every letter with its name / sound / example words + audio."""
+    import csv
+    from collections import OrderedDict
+    from pathlib import Path
+    from django.conf import settings
+    path = Path(settings.BASE_DIR) / "learn" / "data" / "alphabet.csv"
+    letters = OrderedDict()
+    with open(path, encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            g = r["letter"]
+            L = letters.setdefault(g, {"glyph": g, "name": None, "sound": None, "words": []})
+            e = {"key": r["audio_key"], "fa": r["persian"],
+                 "tr": r["transliteration"], "en": r["english_or_note"]}
+            typ = r["type"]
+            if typ == "name":
+                L["name"] = e
+            elif typ == "sound":
+                L["sound"] = e
+            else:
+                L["words"].append(e)
+    return render(request, "learn/alphabet.html", {"letters": list(letters.values())})

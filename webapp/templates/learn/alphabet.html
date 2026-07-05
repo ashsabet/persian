@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Alphabet reference{% endblock %}
+{% block content %}
+<h2>The Persian Alphabet</h2>
+<p class="muted">Tap 🔊 to hear the letter's name, its sound, or an example word — 🐢 plays it slowly. All in Shahrzad's voice.</p>
+<div class="alpha-grid">
+  {% for l in letters %}
+  <div class="alpha-card">
+    <div class="alpha-top">
+      <span class="glyph fa">{{ l.glyph }}</span>
+      <span class="lname">{{ l.name.tr }}</span>
+    </div>
+    <div class="alpha-row">
+      <span class="lbl">name</span>
+      <button class="ab" data-audio="{{ l.name.key }}">🔊</button>
+      <button class="ab" data-audio="{{ l.name.key }}" data-slow>🐢</button>
+    </div>
+    <div class="alpha-row">
+      <span class="lbl">sound</span><span class="sg">{{ l.sound.tr }}</span>
+      <button class="ab" data-audio="{{ l.sound.key }}">🔊</button>
+      <button class="ab" data-audio="{{ l.sound.key }}" data-slow>🐢</button>
+    </div>
+    {% for w in l.words %}
+    <div class="alpha-row word">
+      <span class="wfa fa">{{ w.fa }}</span>
+      <span class="wtr">{{ w.tr }}</span><span class="wen">{{ w.en }}</span>
+      <button class="ab" data-audio="{{ w.key }}">🔊</button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+<style>
+.alpha-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:14px}
+.alpha-card{background:#fff;border:1px solid #e6e9ee;border-radius:12px;padding:12px 14px}
+.alpha-top{display:flex;align-items:baseline;gap:10px;border-bottom:1px solid #eef1f4;padding-bottom:8px;margin-bottom:8px}
+.glyph{font-size:40px;font-weight:800}
+.lname{font-size:16px;color:#2f9e6b;font-weight:700}
+.alpha-row{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:14px}
+.alpha-row .lbl{width:48px;color:#889;font-size:12px;text-transform:uppercase}
+.sg{color:#178a54}
+.alpha-row.word .wfa{font-size:18px;font-weight:700;min-width:52px}
+.wtr{color:#178a54;font-size:13px}.wen{color:#667;font-size:12px;flex:1}
+.ab{margin-left:auto;border:1px solid #cfd7d2;background:#fff;border-radius:8px;padding:3px 8px;cursor:pointer;font-size:14px}
+.alpha-row.word .ab{margin-left:6px}
+.ab:hover{background:#eef7f1}
+</style>
+<script>
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('[data-audio]'); if (!b) return;
+  var a = new Audio('/media/audio/' + b.getAttribute('data-audio') + '.wav');
+  try { a.preservesPitch = true; } catch (_) {}
+  a.playbackRate = b.hasAttribute('data-slow') ? 0.6 : 1.0;
+  a.play().catch(function () {});
+});
+</script>
+{% endblock %}
