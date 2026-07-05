@@ -5,3 +5,4 @@ scipy>=1.10
 python-dotenv>=1.0
 # Installed on the server for audio generation (not needed for the web process):
 piper-tts>=1.2
+django-allauth[socialaccount]>=0.63

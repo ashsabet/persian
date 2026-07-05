@@ -1,0 +1,12 @@
+{% load socialaccount %}
+{% get_providers as socialaccount_providers %}
+{% if socialaccount_providers %}
+  <div class="social-sep"><span>or</span></div>
+  {% for provider in socialaccount_providers %}
+    <a class="btn block social social-{{ provider.id }}"
+       href="{% provider_login_url provider.id process='login' %}">
+      <span class="social-ico social-ico-{{ provider.id }}" aria-hidden="true"></span>
+      Continue with {{ provider.name }}
+    </a>
+  {% endfor %}
+{% endif %}

@@ -14,6 +14,7 @@
       {% endfor %}
       <button type="submit" class="btn block">Sign up</button>
     </form>
+    {% include "registration/_social_buttons.html" %}
     <p class="center muted" style="margin-top:14px">
       Already have an account? <a href="{% url 'login' %}">Log in</a>
     </p>

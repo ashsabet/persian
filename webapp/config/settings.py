@@ -132,3 +132,54 @@ DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Persian <no-reply@per
 
 # Behind Apache reverse proxy terminating TLS.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# --- Social login (Google / Microsoft) via django-allauth ------------------
+# Users can still register with username+password; these add one-click sign-in.
+# OAuth client IDs/secrets come from the environment (.env) — nothing hard-coded.
+INSTALLED_APPS += [
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "allauth.socialaccount.providers.microsoft",
+]
+MIDDLEWARE += ["allauth.account.middleware.AccountMiddleware"]
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+SITE_ID = 1
+
+# Go straight to the provider on button click; don't force email verification
+# for accounts vouched for by Google/Microsoft; auto-link to an existing local
+# account with the same verified email so users aren't duplicated.
+SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
+SOCIALACCOUNT_EMAIL_REQUIRED = False
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+LOGIN_REDIRECT_URL = "home"
+
+# Provider apps are read from env; a provider only appears on the login page
+# once its client id is set, so unconfigured buttons never show.
+SOCIALACCOUNT_PROVIDERS = {}
+_g_id = os.environ.get("GOOGLE_CLIENT_ID", "").strip()
+if _g_id:
+    SOCIALACCOUNT_PROVIDERS["google"] = {
+        "APPS": [{
+            "client_id": _g_id,
+            "secret": os.environ.get("GOOGLE_CLIENT_SECRET", "").strip(),
+            "key": "",
+        }],
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"access_type": "online"},
+    }
+_m_id = os.environ.get("MICROSOFT_CLIENT_ID", "").strip()
+if _m_id:
+    SOCIALACCOUNT_PROVIDERS["microsoft"] = {
+        "APPS": [{
+            "client_id": _m_id,
+            "secret": os.environ.get("MICROSOFT_CLIENT_SECRET", "").strip(),
+            "settings": {"tenant": os.environ.get("MICROSOFT_TENANT", "common").strip()},
+        }],
+    }

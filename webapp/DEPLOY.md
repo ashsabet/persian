@@ -75,9 +75,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py collectstatic --noinput
-python manage.py install_audio            # copy recorded (Shahrzad) clips into media/audio
-python manage.py seed_content             # rebuild alphabet lessons from learn/data/alphabet.csv
-python manage.py generate_audio           # (optional) render gyro TTS for non-alphabet vocab
+python manage.py generate_audio           # renders only new/missing clips
 sudo systemctl restart persian
 ```
 
@@ -87,3 +85,53 @@ sudo systemctl restart persian
 - The web process never calls Piper or any network service at request time — audio
   is pre-rendered files served by Apache.
 - `generate_audio` is idempotent; use `--force` to re-render after a voice change.
+
+## Social login (Google / Microsoft) — optional
+
+Users can register with a username+password as before; these add one-click
+"Continue with Google/Microsoft" buttons. A button only appears once that
+provider's client id is set in `.env`, so you can enable one, both, or neither.
+
+Callback (redirect) URLs to register with each provider:
+
+- Google:    `https://persian.ashkon.net/accounts/google/login/callback/`
+- Microsoft: `https://persian.ashkon.net/accounts/microsoft/login/callback/`
+
+### Google
+
+1. Google Cloud Console → **APIs & Services → Credentials**.
+2. Configure the **OAuth consent screen** (External; app name, support email;
+   add your email as a test user while unpublished).
+3. **Create credentials → OAuth client ID → Web application**.
+   - Authorized JavaScript origin: `https://persian.ashkon.net`
+   - Authorized redirect URI: `https://persian.ashkon.net/accounts/google/login/callback/`
+4. Copy the **Client ID** and **Client secret** into `.env` as
+   `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`.
+
+### Microsoft
+
+1. Azure Portal → **Microsoft Entra ID → App registrations → New registration**.
+2. Supported account types: **Accounts in any org directory and personal
+   Microsoft accounts** (this matches `MICROSOFT_TENANT=common`).
+3. Redirect URI (platform **Web**):
+   `https://persian.ashkon.net/accounts/microsoft/login/callback/`
+4. **Certificates & secrets → New client secret**; copy the secret **Value**.
+5. Put the **Application (client) ID** and secret into `.env` as
+   `MICROSOFT_CLIENT_ID` / `MICROSOFT_CLIENT_SECRET`. Set `MICROSOFT_TENANT` to a
+   specific tenant id if you want to restrict sign-in to one organization.
+
+### Apply on the server
+
+```bash
+cd /opt/persian/webapp && git pull
+source .venv/bin/activate
+pip install -r requirements.txt          # installs django-allauth
+nano .env                                # add the GOOGLE_/MICROSOFT_ values
+python manage.py migrate                 # creates allauth + sites tables
+python manage.py collectstatic --noinput # ships the new CSS/icons
+sudo systemctl restart persian
+```
+
+Sign-in with a matching **verified email** links to an existing local account
+rather than creating a duplicate. No secrets live in the database or git — the
+client id/secret are read from `.env` at startup.
