@@ -9,7 +9,7 @@
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="{% url 'home' %}">پارسی <span>Persian</span></a>
+    <a class="brand" href="{% url 'home' %}">فارسی <span>Persian</span></a>
     <nav>
       {% if user.is_authenticated %}
         <span class="streak" title="Day streak">🔥 {{ user.profile.streak_count }}</span>
