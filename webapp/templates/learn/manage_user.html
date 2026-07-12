@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Manage {{ u.username }}{% endblock %}
+{% block content %}
+<p><a class="back" href="{% url 'manage_users' %}">← All learners</a></p>
+
+<div class="card">
+  <div class="mu-head">
+    <h2>{{ u.username }}</h2>
+    {% if u.is_superuser %}<span class="tag admin">admin</span>
+    {% elif u.is_staff %}<span class="tag staff">staff</span>{% endif %}
+  </div>
+  <p class="muted mu-meta">
+    {{ u.email|default:"no email" }} ·
+    joined {{ u.date_joined|date:"M j, Y" }} ·
+    last login {{ u.last_login|date:"M j, Y H:i"|default:"never" }} ·
+    sign-in: {% for p in providers %}<span class="tag prov">{{ p }}</span>{% empty %}password{% endfor %}
+  </p>
+  <div class="stat-row">
+    <div class="stat"><div class="n">🔥 {{ streak }}</div><div class="l">day streak</div></div>
+    <div class="stat"><div class="n">{{ lessons_done }}/{{ total_lessons }}</div><div class="l">lessons</div></div>
+    <div class="stat"><div class="n">{{ sections_completed }}</div><div class="l">sections done</div></div>
+    <div class="stat"><div class="n">{{ profile.words_learned }}</div><div class="l">words</div></div>
+    <div class="stat"><div class="n">{{ profile.daily_goal_lessons }}</div><div class="l">daily goal</div></div>
+  </div>
+</div>
+
+<div class="grid2">
+  <form class="card action" method="post">
+    {% csrf_token %}<input type="hidden" name="action" value="set_username">
+    <h3>Change username</h3>
+    <input class="inp" type="text" name="username" value="{{ u.username }}" autocomplete="off">
+    <button class="btn secondary" type="submit">Save username</button>
+  </form>
+
+  <form class="card action" method="post">
+    {% csrf_token %}<input type="hidden" name="action" value="set_email">
+    <h3>Change email</h3>
+    <input class="inp" type="email" name="email" value="{{ u.email }}" autocomplete="off" placeholder="name@example.com">
+    <button class="btn secondary" type="submit">Save email</button>
+  </form>
+</div>
+
+<form class="card action" method="post">
+  {% csrf_token %}<input type="hidden" name="action" value="reset_password">
+  <h3>Password reset</h3>
+  <p class="muted">Emails {{ u.email|default:"—" }} a secure link to set a new password. The user's current password stays valid until they use it.</p>
+  <button class="btn secondary" type="submit" {% if not u.email %}disabled{% endif %}>Send reset email</button>
+</form>
+
+<form class="card action" method="post">
+  {% csrf_token %}<input type="hidden" name="action" value="unlock_units">
+  <h3>Unlock units</h3>
+  <p class="muted">Tick a unit to grant access regardless of progress. Units the learner has already completed stay open whether ticked or not.</p>
+  {% for s in tree %}
+    <div class="unlock-sec">{{ s.obj.title }}</div>
+    <div class="unlock-grid">
+      {% for un in s.units %}
+      <label class="ubox {% if un.complete %}done{% endif %}">
+        <input type="checkbox" name="units" value="{{ un.obj.id }}" {% if un.unlocked %}checked{% endif %}>
+        <span class="ut">{{ un.obj.title }}</span>
+        <span class="up">{{ un.lessons_done }}/{{ un.lessons_total }}{% if un.complete %} ✓{% endif %}</span>
+      </label>
+      {% endfor %}
+    </div>
+  {% endfor %}
+  <button class="btn" type="submit">Save unlocked units</button>
+</form>
+
+<div class="card action danger-zone">
+  <h3>Danger zone</h3>
+
+  <div class="dz-row">
+    <div class="dz-desc">
+      <b>Staff access</b>
+      <p class="muted">{% if u.is_staff %}Can open this admin console.{% else %}Standard learner — no admin access.{% endif %}</p>
+    </div>
+    <form method="post">
+      {% csrf_token %}<input type="hidden" name="action" value="toggle_staff">
+      <button class="btn secondary" type="submit" {% if u.pk == user.pk %}disabled title="You can't change your own access"{% endif %}>
+        {% if u.is_staff %}Revoke staff{% else %}Make staff{% endif %}
+      </button>
+    </form>
+  </div>
+
+  <hr class="dz-hr">
+
+  <div class="dz-row">
+    <div class="dz-desc">
+      <b>Delete account</b>
+      <p class="muted">Permanently removes <b>{{ u.username }}</b> and all their progress. This cannot be undone.</p>
+    </div>
+    <form method="post" onsubmit="return confirm('Delete {{ u.username }} and all their data? This cannot be undone.');">
+      {% csrf_token %}<input type="hidden" name="action" value="delete_user">
+      <div class="dz-del">
+        <input class="inp" name="confirm_username" placeholder="type “{{ u.username }}”" autocomplete="off"
+               {% if u.pk == user.pk %}disabled{% endif %}>
+        <button class="btn danger" type="submit" {% if u.pk == user.pk %}disabled title="You can't delete your own account"{% endif %}>Delete</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+.back{color:var(--accent-d);text-decoration:none;font-weight:600}
+.mu-head{display:flex;align-items:center;gap:10px}
+.mu-meta{margin:4px 0 0;font-size:13px}
+.card.action{margin-top:16px}
+.card.action h3{margin:0 0 10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid2 .card.action{margin-top:16px}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+.inp{width:100%;padding:11px 12px;border:2px solid var(--line);border-radius:10px;
+  font-size:15px;margin-bottom:12px;background:var(--panel);color:var(--ink)}
+.inp:focus{outline:none;border-color:var(--accent)}
+.unlock-sec{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);
+  margin:14px 0 6px}
+.unlock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.ubox{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;
+  padding:9px 11px;cursor:pointer;font-size:13px}
+.ubox:hover{border-color:var(--accent)}
+.ubox.done{background:#f2f9f5;border-color:#bfe0cd}
+.ubox .ut{font-weight:600;flex:1;min-width:0}
+.ubox .up{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:1px 8px}
+.tag.admin{background:#ffe3e3;color:#b3261e}.tag.staff{background:#e7eefc;color:#1b52c4}
+.tag.prov{background:#eaf4ef;color:#178a54;text-transform:capitalize}
+
+.danger-zone{border-color:#f0c9c6}
+.danger-zone h3{color:#b3261e}
+.dz-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.dz-desc{flex:1;min-width:220px}
+.dz-desc b{display:block}
+.dz-desc p{margin:2px 0 0}
+.dz-hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+.dz-del{display:flex;gap:8px;align-items:center}
+.dz-del .inp{margin-bottom:0;width:auto}
+.btn.danger{background:#d9534f;color:#fff}
+.btn.danger:hover{background:#c9302c}
+.btn.danger:disabled{background:#e6b3b1;cursor:not-allowed}
+</style>
+{% endblock %}
