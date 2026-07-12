@@ -1,11 +1,14 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path
 
-from . import views
+from . import staff_views, views
 
 urlpatterns = [
     path("", views.home, name="home"),
     path("profile/", views.profile_view, name="profile"),
+    # Staff console
+    path("manage/", staff_views.manage_users, name="manage_users"),
+    path("manage/user/<int:user_id>/", staff_views.manage_user, name="manage_user"),
     path("alphabet/", views.alphabet, name="alphabet"),
     path("alphabet/<slug:slug>/worksheet/", views.letter_worksheet, name="letter_worksheet"),
     path("lesson/<slug:slug>/", views.lesson, name="lesson"),

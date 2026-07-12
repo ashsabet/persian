@@ -9,6 +9,15 @@ body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-ser
 a{color:var(--accent-d);text-decoration:none}
 .container{max-width:720px;margin:0 auto;padding:20px}
 
+/* Flash messages */
+.messages{list-style:none;padding:0;margin:0 0 16px}
+.msg{padding:11px 14px;border-radius:10px;margin-bottom:8px;font-size:14px;font-weight:600;
+  border:1px solid transparent}
+.msg.success{background:#eaf7f0;color:#1c7a4d;border-color:#bfe0cd}
+.msg.error{background:#fdecec;color:#b3261e;border-color:#f4c2c0}
+.msg.info{background:#eef2fb;color:#28489e;border-color:#cdd8f2}
+.msg.warning{background:#fdf4e3;color:#8a5a10;border-color:#f0dcae}
+
 /* Top bar */
 .topbar{display:flex;align-items:center;justify-content:space-between;
   background:var(--panel);border-bottom:1px solid var(--line);padding:12px 18px}

@@ -142,6 +142,12 @@ class Profile(models.Model):
     daily_goal_lessons = models.PositiveIntegerField(default=1)
     hearts_enabled = models.BooleanField(default=False)  # optional, off by default
     words_learned = models.PositiveIntegerField(default=0)
+    # Units an admin has unlocked for this user, in addition to the ones opened
+    # by sequential lesson completion. Lets staff grant access without faking
+    # progress (which would inflate streak / words-learned).
+    unlocked_units = models.ManyToManyField(
+        "Unit", blank=True, related_name="unlocked_for",
+    )
 
     def __str__(self) -> str:
         return f"Profile<{self.user.username}>"
