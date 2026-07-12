@@ -146,15 +146,32 @@ class Profile(models.Model):
     def __str__(self) -> str:
         return f"Profile<{self.user.username}>"
 
+    @property
+    def current_streak(self) -> int:
+        """The live streak, correct on every read from any device.
+
+        `streak_count` is the streak as of `last_active_date`. It only still
+        stands if the last active day was today or yesterday; once a full day is
+        missed the streak has lapsed, so we report 0 without waiting for the next
+        completed lesson to reset the stored value.
+        """
+        if not self.last_active_date:
+            return 0
+        if self.last_active_date >= timezone.localdate() - timedelta(days=1):
+            return self.streak_count
+        return 0
+
     def register_activity(self) -> None:
-        """Update the daily streak when the learner completes activity today."""
+        """Update the daily streak when the learner completes activity today.
+
+        Uses `current_streak` so a lapsed streak restarts at 1 and an unbroken
+        one (last active yesterday) increments — independent of which device or
+        how many days since the stored value was last written.
+        """
         today = timezone.localdate()
         if self.last_active_date == today:
             return  # already counted today
-        if self.last_active_date == today - timedelta(days=1):
-            self.streak_count += 1
-        else:
-            self.streak_count = 1
+        self.streak_count = self.current_streak + 1
         self.last_active_date = today
         self.save(update_fields=["streak_count", "last_active_date"])
 
