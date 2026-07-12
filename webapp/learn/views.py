@@ -188,26 +188,76 @@ def register(request):
     return render(request, "registration/register.html", {"form": form})
 
 
-@login_required
-def alphabet(request):
-    """Reference chart: every letter with its name / sound / example words + audio."""
+def _load_alphabet():
+    """Parse alphabet.csv into an ordered list of per-letter dicts.
+
+    Each letter carries a URL-safe `slug` (derived from its name audio key, e.g.
+    `name-alef` -> `alef`) plus its name / sound / example words.
+    """
     import csv
     from collections import OrderedDict
     from pathlib import Path
     from django.conf import settings
     path = Path(settings.BASE_DIR) / "learn" / "data" / "alphabet.csv"
     letters = OrderedDict()
+    for_slug = {}
     with open(path, encoding="utf-8") as f:
         for r in csv.DictReader(f):
             g = r["letter"]
-            L = letters.setdefault(g, {"glyph": g, "name": None, "sound": None, "words": []})
+            L = letters.setdefault(
+                g, {"glyph": g, "slug": None, "name": None, "sound": None, "words": []}
+            )
             e = {"key": r["audio_key"], "fa": r["persian"],
                  "tr": r["transliteration"], "en": r["english_or_note"]}
             typ = r["type"]
             if typ == "name":
                 L["name"] = e
+                L["slug"] = r["audio_key"].split("name-", 1)[-1]
             elif typ == "sound":
                 L["sound"] = e
             else:
                 L["words"].append(e)
-    return render(request, "learn/alphabet.html", {"letters": list(letters.values())})
+    return list(letters.values())
+
+
+@login_required
+def alphabet(request):
+    """Reference chart: every letter with its name / sound / example words + audio."""
+    return render(request, "learn/alphabet.html", {"letters": _load_alphabet()})
+
+
+# Persian letters that do not connect to the following (left) letter, so they
+# only have isolated and final forms — no distinct initial/medial shapes.
+_NON_JOINERS = set("ادذرزژو")
+_ZWJ = "‍"  # zero-width joiner: coaxes a font into rendering positional forms
+
+
+@login_required
+def letter_worksheet(request, slug):
+    """A printable handwriting worksheet for one letter, in all its forms."""
+    from django.http import Http404
+    letter = next((l for l in _load_alphabet() if l["slug"] == slug), None)
+    if letter is None:
+        raise Http404("Unknown letter")
+
+    g = letter["glyph"]
+    joins = g not in _NON_JOINERS
+    if joins:
+        forms = [
+            {"label": "Isolated", "glyph": g},
+            {"label": "Initial", "glyph": g + _ZWJ},
+            {"label": "Medial", "glyph": _ZWJ + g + _ZWJ},
+            {"label": "Final", "glyph": _ZWJ + g},
+        ]
+    else:
+        # Non-joining letters connect only on the right.
+        forms = [
+            {"label": "Isolated", "glyph": g},
+            {"label": "Final", "glyph": _ZWJ + g},
+        ]
+    return render(
+        request,
+        "learn/worksheet.html",
+        {"letter": letter, "forms": forms, "joins": joins,
+         "trace_count": 4, "blank_count": 6},
+    )
