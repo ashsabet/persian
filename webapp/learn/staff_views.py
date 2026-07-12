@@ -23,11 +23,11 @@ from .models import Section, Unit, UserLessonProgress
 
 
 def staff_required(view):
-    """Allow only authenticated staff; send anonymous users to log in."""
+    """Allow only authenticated staff (or superusers); send anon users to log in."""
     @wraps(view)
     @login_required
     def wrapper(request, *args, **kwargs):
-        if not request.user.is_staff:
+        if not (request.user.is_staff or request.user.is_superuser):
             raise PermissionDenied
         return view(request, *args, **kwargs)
     return wrapper
@@ -155,11 +155,42 @@ def _do_unlock_units(request, user):
     messages.success(request, f"Saved unlocked units ({len(valid)} selected).")
 
 
+def _do_toggle_staff(request, user):
+    if user.pk == request.user.pk:
+        messages.error(request, "You can't change your own staff access.")
+        return
+    user.is_staff = not user.is_staff
+    user.save(update_fields=["is_staff"])
+    messages.success(
+        request,
+        f"{user.username} is {'now staff' if user.is_staff else 'no longer staff'}.",
+    )
+
+
+def _do_delete_user(request, user):
+    if user.pk == request.user.pk:
+        messages.error(request, "You can't delete your own account.")
+        return
+    typed = (request.POST.get("confirm_username") or "").strip()
+    if typed != user.username:
+        messages.error(request, "Type the exact username to confirm deletion.")
+        return
+    if user.is_superuser and User.objects.filter(is_superuser=True).count() <= 1:
+        messages.error(request, "Can't delete the last remaining superuser.")
+        return
+    name = user.username
+    user.delete()  # cascades to profile, progress, and social accounts
+    messages.success(request, f"Deleted account “{name}” and all its data.")
+    return redirect("manage_users")
+
+
 _ACTIONS = {
     "reset_password": _do_reset_password,
     "set_username": _do_set_username,
     "set_email": _do_set_email,
     "unlock_units": _do_unlock_units,
+    "toggle_staff": _do_toggle_staff,
+    "delete_user": _do_delete_user,
 }
 
 
@@ -170,7 +201,11 @@ def manage_user(request, user_id):
     if request.method == "POST":
         handler = _ACTIONS.get(request.POST.get("action"))
         if handler:
-            handler(request, user)
+            # A handler may return a redirect (e.g. delete goes back to the list);
+            # otherwise fall through to re-render this user's page.
+            resp = handler(request, user)
+            if resp is not None:
+                return resp
         else:
             messages.error(request, "Unknown action.")
         return redirect("manage_user", user_id=user.id)

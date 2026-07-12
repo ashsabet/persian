@@ -66,6 +66,40 @@
   <button class="btn" type="submit">Save unlocked units</button>
 </form>
 
+<div class="card action danger-zone">
+  <h3>Danger zone</h3>
+
+  <div class="dz-row">
+    <div class="dz-desc">
+      <b>Staff access</b>
+      <p class="muted">{% if u.is_staff %}Can open this admin console.{% else %}Standard learner — no admin access.{% endif %}</p>
+    </div>
+    <form method="post">
+      {% csrf_token %}<input type="hidden" name="action" value="toggle_staff">
+      <button class="btn secondary" type="submit" {% if u.pk == user.pk %}disabled title="You can't change your own access"{% endif %}>
+        {% if u.is_staff %}Revoke staff{% else %}Make staff{% endif %}
+      </button>
+    </form>
+  </div>
+
+  <hr class="dz-hr">
+
+  <div class="dz-row">
+    <div class="dz-desc">
+      <b>Delete account</b>
+      <p class="muted">Permanently removes <b>{{ u.username }}</b> and all their progress. This cannot be undone.</p>
+    </div>
+    <form method="post" onsubmit="return confirm('Delete {{ u.username }} and all their data? This cannot be undone.');">
+      {% csrf_token %}<input type="hidden" name="action" value="delete_user">
+      <div class="dz-del">
+        <input class="inp" name="confirm_username" placeholder="type “{{ u.username }}”" autocomplete="off"
+               {% if u.pk == user.pk %}disabled{% endif %}>
+        <button class="btn danger" type="submit" {% if u.pk == user.pk %}disabled title="You can't delete your own account"{% endif %}>Delete</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <style>
 .back{color:var(--accent-d);text-decoration:none;font-weight:600}
 .mu-head{display:flex;align-items:center;gap:10px}
@@ -90,5 +124,18 @@
 .tag{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:1px 8px}
 .tag.admin{background:#ffe3e3;color:#b3261e}.tag.staff{background:#e7eefc;color:#1b52c4}
 .tag.prov{background:#eaf4ef;color:#178a54;text-transform:capitalize}
+
+.danger-zone{border-color:#f0c9c6}
+.danger-zone h3{color:#b3261e}
+.dz-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.dz-desc{flex:1;min-width:220px}
+.dz-desc b{display:block}
+.dz-desc p{margin:2px 0 0}
+.dz-hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+.dz-del{display:flex;gap:8px;align-items:center}
+.dz-del .inp{margin-bottom:0;width:auto}
+.btn.danger{background:#d9534f;color:#fff}
+.btn.danger:hover{background:#c9302c}
+.btn.danger:disabled{background:#e6b3b1;cursor:not-allowed}
 </style>
 {% endblock %}
