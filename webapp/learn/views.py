@@ -31,11 +31,15 @@ def home(request):
     )
 
     # Sequential unlock: lesson is open if it's the first or the previous is done.
+    # Units an admin has manually unlocked open all of their lessons too.
+    unlocked_unit_ids = set(
+        request.user.profile.unlocked_units.values_list("id", flat=True)
+    )
     unlocked_ids = set()
     prev_done = True
     current_id = None
     for lesson in lessons:
-        is_open = prev_done
+        is_open = prev_done or lesson.unit_id in unlocked_unit_ids
         if is_open:
             unlocked_ids.add(lesson.id)
         if is_open and lesson.id not in completed_ids and current_id is None:

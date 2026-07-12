@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Manage learners{% endblock %}
+{% block content %}
+<div class="mgr-head">
+  <h2>Learners</h2>
+  <span class="muted">{{ rows|length }} account{{ rows|length|pluralize }}</span>
+</div>
+
+<div class="table-scroll">
+  <table class="mgr-table">
+    <thead>
+      <tr>
+        <th>User</th><th>Email</th><th class="num">🔥</th>
+        <th class="num">Lessons</th><th class="num">Sections</th>
+        <th>Last login</th><th>Joined</th><th>Sign-in</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td>
+          <a class="uname" href="{% url 'manage_user' r.user.id %}">{{ r.user.username }}</a>
+          {% if r.user.is_superuser %}<span class="tag admin">admin</span>
+          {% elif r.user.is_staff %}<span class="tag staff">staff</span>{% endif %}
+        </td>
+        <td class="email">{{ r.user.email|default:"—" }}</td>
+        <td class="num">{{ r.streak }}</td>
+        <td class="num">{{ r.lessons_done }}/{{ total_lessons }}</td>
+        <td class="num">{{ r.sections_completed }}/{{ total_sections }}</td>
+        <td class="muted">{{ r.user.last_login|date:"M j, Y H:i"|default:"never" }}</td>
+        <td class="muted">{{ r.user.date_joined|date:"M j, Y" }}</td>
+        <td>
+          {% for p in r.providers %}<span class="tag prov">{{ p }}</span>{% empty %}
+          <span class="muted">password</span>{% endfor %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="8" class="muted">No users yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<style>
+.mgr-head{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+.table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+.mgr-table{border-collapse:collapse;width:100%;font-size:14px;background:var(--panel)}
+.mgr-table th,.mgr-table td{padding:10px 12px;text-align:left;white-space:nowrap;
+  border-bottom:1px solid var(--line)}
+.mgr-table thead th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;
+  color:var(--muted);background:#f7f8f9}
+.mgr-table tbody tr:last-child td{border-bottom:0}
+.mgr-table .num{text-align:right;font-variant-numeric:tabular-nums}
+.mgr-table .email{max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.uname{font-weight:700;color:var(--accent-d);text-decoration:none}
+.uname:hover{text-decoration:underline}
+.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:20px;padding:1px 8px;margin-left:4px}
+.tag.admin{background:#ffe3e3;color:#b3261e}
+.tag.staff{background:#e7eefc;color:#1b52c4}
+.tag.prov{background:#eaf4ef;color:#178a54;text-transform:capitalize}
+</style>
+{% endblock %}
