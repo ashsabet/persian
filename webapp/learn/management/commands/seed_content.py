@@ -67,7 +67,9 @@ class Command(BaseCommand):
             rng.shuffle(toks)
             return toks
 
-        Section.objects.all().delete()  # rebuild everything (progress cascades)
+        # Rebuild only the alphabet section, so seeding it never wipes the
+        # vocabulary sections (seed_curriculum) or their learners' progress.
+        Section.objects.filter(slug="script").delete()
         sec = Section.objects.create(slug="script", order=0, title="The Persian Script",
                                      description="Learn to read and pronounce all 32 letters.")
 

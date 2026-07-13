@@ -8,11 +8,13 @@ Generate Persian audio for every Word and Sentence using the local Piper
   * short fade in/out + small padding (no clicks / abrupt cuts)
   * peak-normalize to TARGET_PEAK_DB (headroom, no clipping)
 
-Produces a normal and a slow ('-slow') WAV per item under MEDIA_ROOT/audio/.
-Re-runnable; skips existing files unless --force.
+Produces a normal-speed WAV per item under MEDIA_ROOT/audio/ (pass --slow to also
+render '-slow' clips; the player slows playback in the browser, so they're unused
+by default). Re-runnable; skips existing files unless --force.
 
     python manage.py generate_audio
     python manage.py generate_audio --force
+    python manage.py generate_audio --slow             # also render -slow clips
     python manage.py generate_audio --no-postprocess   # raw Piper output
 
 Requires the Piper CLI on PATH and PIPER_MODEL set (see .env). Runs on the
@@ -101,6 +103,10 @@ class Command(BaseCommand):
         parser.add_argument("--force", action="store_true", help="Re-render existing files.")
         parser.add_argument("--no-postprocess", action="store_true",
                             help="Render raw Piper audio without the EQ/normalize pass.")
+        parser.add_argument("--slow", action="store_true",
+                            help="Also render a '-slow' clip per item. Off by default — the "
+                                 "player slows playback in the browser (playbackRate), so the "
+                                 "extra files are unused.")
 
     def handle(self, *args, **options):
         model = settings.PIPER_MODEL
@@ -116,9 +122,13 @@ class Command(BaseCommand):
         items = [(w.audio_key, w.persian) for w in Word.objects.all()]
         items += [(s.audio_key, s.persian) for s in Sentence.objects.all()]
 
+        variants = [("", NORMAL_LENGTH)]
+        if options["slow"]:
+            variants.append(("-slow", SLOW_LENGTH))
+
         made = 0
         for key, text in items:
-            for suffix, length in (("", NORMAL_LENGTH), ("-slow", SLOW_LENGTH)):
+            for suffix, length in variants:
                 target = out_dir / f"{key}{suffix}.wav"
                 if target.exists() and not options["force"]:
                     continue
